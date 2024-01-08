@@ -1,52 +1,39 @@
-import {Column, Model, DataType, Table, BelongsToMany} from "sequelize-typescript";
+import {BelongsToMany, Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {Role} from "../roles/roles.model";
 import {UserRoles} from "../roles/user-roles.model";
+import {Post} from "../posts/posts.model";
 
 interface UserCreationAttrs {
-  email: string
-  password: string
+    email: string;
+    password: string;
 }
 
 @Table({tableName: 'users'})
 export class User extends Model<User, UserCreationAttrs> {
-  @ApiProperty({example: 1, description: "Unique identifier"})
-  @Column({
-    type: DataType.INTEGER,
-    unique: true,
-    autoIncrement: true,
-    primaryKey: true
-  })
-  id: number;
+    @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
+    @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
+    id: number;
 
-  @ApiProperty({example: 'example@gmail.com', description: "Email address"})
-  @Column({
-    type: DataType.STRING,
-    unique: true,
-    allowNull: false
-  })
-  email: string
+    @ApiProperty({example: 'user@mail.ru', description: 'Почтовый адрес'})
+    @Column({type: DataType.STRING, unique: true, allowNull: false})
+    email: string;
 
-  @ApiProperty({example: 'cxjh2341', description: "Password"})
-  @Column({
-    type: DataType.STRING,
-    allowNull: false
-  })
-  password: string
+    @ApiProperty({example: '12345678', description: 'Пароль'})
+    @Column({type: DataType.STRING, allowNull: false})
+    password: string;
 
-  @ApiProperty({example: true, description: "Banned user or not"})
-  @Column({
-    type: DataType.BOOLEAN, defaultValue: false
-  })
-  banned: boolean
+    @ApiProperty({example: 'true', description: 'Забанен или нет'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    banned: boolean;
 
-  @ApiProperty({example: 'For hooliganism, bad boy', description: "reason for ban"})
-  @Column({
-    type: DataType.STRING,
-    allowNull: true
-  })
-  banReason: string;
+    @ApiProperty({example: 'За хулиганство', description: 'Причина блокировки'})
+    @Column({type: DataType.STRING, allowNull: true})
+    banReason: string;
 
-  @BelongsToMany(()=>Role,()=>UserRoles)
-  roles:Role[]
+    @BelongsToMany(() => Role, () => UserRoles)
+    roles: Role[];
+
+    @HasMany(() => Post)
+    posts: Post[];
 }
