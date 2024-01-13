@@ -1,4 +1,4 @@
-import { Column, DataType, Model, Table} from "sequelize-typescript";
+import {Column, DataType, Model, Table} from "sequelize-typescript";
 
 interface BlogCreationAttrs {
   title: string;
@@ -6,6 +6,7 @@ interface BlogCreationAttrs {
   slug: string;
   date?: string;
   image: string;
+  authorName?: string
 }
 
 @Table({tableName: 'blogs'})
@@ -27,5 +28,8 @@ export class Blog extends Model<Blog, BlogCreationAttrs> {
 
   @Column({type: DataType.STRING})
   image: string;
+
+  @Column({type: DataType.STRING, allowNull: false, defaultValue: 'Henrik Annemark'})
+  authorName: string;
 
 }

@@ -81,7 +81,7 @@ export class BlogsService {
   async update(slug: string, updateBlogDto: UpdateBlogDto) {
     try {
       const blogToUpdate = await this.blogRepository.findOne({where: {slug}});
-
+//todo: refactor , throw not working correct in try block
       if (!blogToUpdate) {
         throw new HttpException(`Blog with slug: ${slug} not found`, HttpStatus.NOT_FOUND);
       }
@@ -100,7 +100,7 @@ export class BlogsService {
   async remove(slug: string) {
     try {
       const blogToRemove = await this.blogRepository.findOne({where: {slug}});
-
+//todo: refactor , throw not working correct in try block
       if (!blogToRemove) {
         throw new HttpException(`Blog with slug: ${slug} not found`, HttpStatus.NOT_FOUND);
       }

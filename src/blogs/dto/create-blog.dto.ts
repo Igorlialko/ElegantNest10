@@ -14,4 +14,8 @@ export class CreateBlogDto {
 
   @IsString({message: 'Must be a string'})
   readonly slug: string;
+
+  @IsOptional()
+  @IsString({message: 'Must be a string'})
+  readonly authorName: string;
 }

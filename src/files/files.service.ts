@@ -19,6 +19,8 @@ export class FilesService {
   ): Promise<string> {
 
     try {
+      console.log("image",image)
+
       const arrDot = image.originalname?.split('.')
 
       const imageName = `${fileName || uuid.v4()}.${arrDot?.[arrDot.length - 1] || 'jpg'}`
@@ -40,8 +42,13 @@ export class FilesService {
     directoryPath?: string,
     fileName: string
   }) {
-    const filePath = path.resolve(__dirname, '..', 'static', directoryPath)
-    await fs.promises.rm(path.join(filePath, fileName))
+    try {
+      const filePath = path.resolve(__dirname, '..', 'static', directoryPath)
+      await fs.promises.rm(path.join(filePath, fileName))
+    } catch (e) {
+      //todo: log this message
+    }
+
   }
 
 }
