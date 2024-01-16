@@ -5,5 +5,5 @@ export declare class PostsService {
     private postRepository;
     private fileService;
     constructor(postRepository: typeof Post, fileService: FilesService);
-    create(dto: CreatePostDto, image: any): unknown;
+    create(dto: CreatePostDto, image: any): Promise<Post>;
 }

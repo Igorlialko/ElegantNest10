@@ -3,6 +3,10 @@ import { AuthService } from "./auth.service";
 export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
-    login(userDto: CreateUserDto): unknown;
-    registration(userDto: CreateUserDto): unknown;
+    login(userDto: CreateUserDto): Promise<{
+        token: string;
+    }>;
+    registration(userDto: CreateUserDto): Promise<{
+        token: string;
+    }>;
 }

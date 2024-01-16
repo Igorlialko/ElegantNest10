@@ -7,9 +7,9 @@ export declare class UsersService {
     private userRepository;
     private roleService;
     constructor(userRepository: typeof User, roleService: RolesService);
-    createUser(dto: CreateUserDto): unknown;
-    getAllUsers(): unknown;
-    getUserByEmail(email: string): unknown;
-    addRole(dto: AddRoleDto): unknown;
-    ban(dto: BanUserDto): unknown;
+    createUser(dto: CreateUserDto): Promise<any>;
+    getAllUsers(): Promise<User[]>;
+    getUserByEmail(email: string): Promise<User>;
+    addRole(dto: AddRoleDto): Promise<AddRoleDto>;
+    ban(dto: BanUserDto): Promise<User>;
 }
