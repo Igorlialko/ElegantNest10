@@ -34,7 +34,14 @@ import {Blog} from "./blogs/model/blog.model";
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRES_DB,
       models: [User, Role, UserRoles, Post, Blog],
-      autoLoadModels: true
+      autoLoadModels: true,
+      ssl: true, // Enable SSL
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false, // Use this option if you encounter issues with self-signed certificates
+        },
+      },
     }),
     UsersModule,
     RolesModule,
