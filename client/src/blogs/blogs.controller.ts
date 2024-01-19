@@ -3,8 +3,9 @@ import {BlogsService} from './blogs.service';
 import {CreateBlogDto} from './dto/create-blog.dto';
 import {UpdateBlogDto} from './dto/update-blog.dto';
 import {PaginationDto} from "./dto/pagination.dto";
-import {ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {FileInterceptor} from "@nestjs/platform-express";
+import {Blog} from "./model/blog.model";
 
 @ApiTags('Blogs')
 @Controller('blogs')
@@ -12,29 +13,38 @@ export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {
   }
 
-  @Post()
-  @UseInterceptors(FileInterceptor('image'))
-  create(@Body() createBlogDto: CreateBlogDto, @UploadedFile() image) {
-    return this.blogsService.create(createBlogDto, image);
-  }
+  // @Post()
+  // @UseInterceptors(FileInterceptor('image'))
+  // create(@Body() createBlogDto: CreateBlogDto, @UploadedFile() image) {
+  //   return this.blogsService.create(createBlogDto, image);
+  // }
 
+  @ApiOperation({summary: 'Get blogs '})
+  @ApiResponse({status: 200, type: [Blog]})
   @Get()
   async findAll(@Query() paginationDto: PaginationDto) {
     return this.blogsService.findAll(paginationDto);
   }
 
-  @Get(':slug')
-  findOne(@Param('slug') slug: string) {
+  @ApiOperation({summary: 'Get one blogs from slug  '})
+  @ApiResponse({status: 200, type: Blog})
+  @Get('/:slug')
+  findOne(@Param('slug') slug: any) {
     return this.blogsService.findOne(slug);
   }
 
-  @Patch(':slug')
-  update(@Param('slug') slug: string, @Body() updateBlogDto: UpdateBlogDto) {
-    return this.blogsService.update(slug, updateBlogDto);
-  }
+  // @Patch(':slug')
+  // update(@Param('slug') slug: string, @Body() updateBlogDto: UpdateBlogDto) {
+  //   return this.blogsService.update(slug, updateBlogDto);
+  // }
+  //
+  // @Delete(':slug')
+  // remove(@Param('slug') slug: string) {
+  //   return this.blogsService.remove(slug);
+  // }
 
-  @Delete(':slug')
-  remove(@Param('slug') slug: string) {
-    return this.blogsService.remove(slug);
-  }
+  // @Delete()
+  // removeAll() {
+  //   return this.blogsService.removeAll();
+  // }
 }

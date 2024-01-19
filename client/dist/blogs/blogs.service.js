@@ -75,7 +75,7 @@ let BlogsService = class BlogsService {
     async findOne(slug) {
         let blog;
         try {
-            blog = await this.blogRepository.findOne({ where: { slug } });
+            blog = await this.blogRepository.findOne({ where: { slug }, attributes: { exclude: ['createdAt', 'updatedAt'] } });
         }
         catch (e) {
             throw new common_1.HttpException(`Blog with slug : ${slug}, not found`, common_1.HttpStatus.NOT_FOUND);
@@ -107,6 +107,16 @@ let BlogsService = class BlogsService {
         }
         catch (e) {
             throw new common_1.HttpException(`Error removing blog with slug: ${slug}`, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async removeAll() {
+        try {
+            await this.blogRepository.truncate();
+            return `Blogs removed successfully`;
+        }
+        catch (e) {
+            console.log("e", e);
+            throw new common_1.HttpException(`Error removing blogs`, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

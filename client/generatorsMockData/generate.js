@@ -37,11 +37,10 @@ const generateBlog = async (blog,index) => {
 
 }
 
+blogs.forEach((blog,index) => {
 
-// blogs.forEach((blog,index) => {
-//
-//   generateBlog(blog,index)
-//
-// })
+  generateBlog(blog,index)
+
+})
 
 

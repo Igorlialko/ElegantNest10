@@ -9,14 +9,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
-const users_module_1 = require("./users/users.module");
 const config_1 = require("@nestjs/config");
 const users_model_1 = require("./users/users.model");
-const roles_module_1 = require("./roles/roles.module");
 const roles_model_1 = require("./roles/roles.model");
 const user_roles_model_1 = require("./roles/user-roles.model");
-const auth_module_1 = require("./auth/auth.module");
-const posts_module_1 = require("./posts/posts.module");
 const posts_model_1 = require("./posts/posts.model");
 const files_module_1 = require("./files/files.module");
 const serve_static_1 = require("@nestjs/serve-static");
@@ -55,10 +51,6 @@ exports.AppModule = AppModule = __decorate([
                     },
                 },
             }),
-            users_module_1.UsersModule,
-            roles_module_1.RolesModule,
-            auth_module_1.AuthModule,
-            posts_module_1.PostsModule,
             files_module_1.FilesModule,
             blogs_module_1.BlogsModule,
         ]

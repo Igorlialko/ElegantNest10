@@ -12,4 +12,5 @@ export declare class BlogsService {
     findOne(slug: string): Promise<any>;
     update(slug: string, updateBlogDto: UpdateBlogDto): Promise<Blog>;
     remove(slug: string): Promise<string>;
+    removeAll(): Promise<string>;
 }

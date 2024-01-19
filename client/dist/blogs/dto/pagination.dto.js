@@ -11,14 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaginationDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class PaginationDto {
 }
 exports.PaginationDto = PaginationDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '1', description: 'Page for pagination' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], PaginationDto.prototype, "page", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '10', description: 'Limit for pagination' }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], PaginationDto.prototype, "limit", void 0);
