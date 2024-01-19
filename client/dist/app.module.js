@@ -31,7 +31,7 @@ exports.AppModule = AppModule = __decorate([
                 envFilePath: `.${process.env.NODE_ENV}.env`
             }),
             serve_static_1.ServeStaticModule.forRoot({
-                rootPath: path.resolve(__dirname, 'static'),
+                rootPath: path.resolve(__dirname, '..', 'static'),
                 serveRoot: '/static'
             }),
             sequelize_1.SequelizeModule.forRoot({

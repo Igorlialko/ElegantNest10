@@ -17,7 +17,7 @@ let FilesService = class FilesService {
             console.log("image", image);
             const arrDot = image.originalname?.split('.');
             const imageName = `${fileName || uuid.v4()}.${arrDot?.[arrDot.length - 1] || 'jpg'}`;
-            const filePath = path.resolve(__dirname, '..', 'static', directoryPath);
+            const filePath = path.resolve(__dirname, '..', '..', 'static', directoryPath);
             if (!fs.existsSync(filePath)) {
                 fs.mkdirSync(filePath, { recursive: true });
             }

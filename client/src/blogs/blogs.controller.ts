@@ -14,11 +14,11 @@ export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {
   }
 
-  // @Post()
-  // @UseInterceptors(FileInterceptor('image'))
-  // create(@Body() createBlogDto: CreateBlogDto, @UploadedFile() image) {
-  //   return this.blogsService.create(createBlogDto, image);
-  // }
+  @Post()
+  @UseInterceptors(FileInterceptor('image'))
+  create(@Body() createBlogDto: CreateBlogDto, @UploadedFile() image) {
+    return this.blogsService.create(createBlogDto, image);
+  }
 
   @ApiOperation({summary: 'Get blogs '})
   @ApiResponse({status: 200, type: [Blog]})
@@ -44,8 +44,8 @@ export class BlogsController {
   //   return this.blogsService.remove(slug);
   // }
 
-  // @Delete()
-  // removeAll() {
-  //   return this.blogsService.removeAll();
-  // }
+  @Delete()
+  removeAll() {
+    return this.blogsService.removeAll();
+  }
 }

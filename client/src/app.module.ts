@@ -23,7 +23,7 @@ import {Blog} from "./blogs/model/blog.model";
       envFilePath: `.${process.env.NODE_ENV}.env`
     }),
     ServeStaticModule.forRoot({
-      rootPath: path.resolve(__dirname, 'static'),
+      rootPath: path.resolve(__dirname, '..', 'static'),
       serveRoot: '/static'
     }),
     SequelizeModule.forRoot({
