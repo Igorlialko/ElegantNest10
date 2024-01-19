@@ -11,7 +11,8 @@ async function start() {
         .setTitle("BACKEND for Elegant Shop")
         .setDescription('This Documentation Shop created for best friends')
         .setVersion("1.0.0")
-        .addServer("http://localhost:5020", "Local environment")
+        .addServer(process.env.SERVER_URL, "Api for endpoints")
+        .addServer(process.env.SERVER_STATIC_URL, "Api for static")
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup("/api/docs", app, document);
