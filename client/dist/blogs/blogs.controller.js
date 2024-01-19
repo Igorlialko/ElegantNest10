@@ -18,6 +18,7 @@ const blogs_service_1 = require("./blogs.service");
 const pagination_dto_1 = require("./dto/pagination.dto");
 const swagger_1 = require("@nestjs/swagger");
 const blog_model_1 = require("./model/blog.model");
+const slug_dto_1 = require("./dto/slug.dto");
 let BlogsController = class BlogsController {
     constructor(blogsService) {
         this.blogsService = blogsService;
@@ -25,8 +26,8 @@ let BlogsController = class BlogsController {
     async findAll(paginationDto) {
         return this.blogsService.findAll(paginationDto);
     }
-    findOne(slug) {
-        return this.blogsService.findOne(slug);
+    findOne(params) {
+        return this.blogsService.findOne(params.slug);
     }
 };
 exports.BlogsController = BlogsController;
@@ -43,9 +44,9 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get one blogs from slug  ' }),
     (0, swagger_1.ApiResponse)({ status: 200, type: blog_model_1.Blog }),
     (0, common_1.Get)('/:slug'),
-    __param(0, (0, common_1.Param)('slug')),
+    __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [slug_dto_1.SlugDto]),
     __metadata("design:returntype", void 0)
 ], BlogsController.prototype, "findOne", null);
 exports.BlogsController = BlogsController = __decorate([

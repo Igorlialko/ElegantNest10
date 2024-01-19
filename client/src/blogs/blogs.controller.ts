@@ -6,6 +6,7 @@ import {PaginationDto} from "./dto/pagination.dto";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {Blog} from "./model/blog.model";
+import {SlugDto} from "./dto/slug.dto";
 
 @ApiTags('Blogs')
 @Controller('blogs')
@@ -29,8 +30,8 @@ export class BlogsController {
   @ApiOperation({summary: 'Get one blogs from slug  '})
   @ApiResponse({status: 200, type: Blog})
   @Get('/:slug')
-  findOne(@Param('slug') slug: any) {
-    return this.blogsService.findOne(slug);
+  findOne(@Param() params: SlugDto) {
+    return this.blogsService.findOne(params.slug);
   }
 
   // @Patch(':slug')
