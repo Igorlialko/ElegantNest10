@@ -7,13 +7,11 @@ import {RolesModule} from './roles/roles.module';
 import {Role} from "./roles/roles.model";
 import {UserRoles} from "./roles/user-roles.model";
 import {AuthModule} from './auth/auth.module';
-import {PostsModule} from './posts/posts.module';
-import {Post} from "./posts/posts.model";
 import {FilesModule} from './files/files.module';
 import {ServeStaticModule} from "@nestjs/serve-static";
 import {BlogsModule} from './blogs/blogs.module';
 import * as path from 'path';
-import {Blog} from "./blogs/model/blog.model";
+import {Blog} from "@/src/blogs/dto/blog.model";
 
 @Module({
   controllers: [],
@@ -33,7 +31,7 @@ import {Blog} from "./blogs/model/blog.model";
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [User, Role, UserRoles, Post, Blog],
+      models: [User, Role, UserRoles, Blog],
       autoLoadModels: true,
       ssl: true, // Enable SSL
       dialectOptions: {
@@ -43,10 +41,9 @@ import {Blog} from "./blogs/model/blog.model";
         },
       },
     }),
-    // UsersModule,
-    // RolesModule,
-    // AuthModule,
-    // PostsModule,
+    UsersModule,
+    RolesModule,
+    AuthModule,
     FilesModule,
     BlogsModule,
   ]

@@ -1,12 +1,25 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Query, UseInterceptors, UploadedFile} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get, HttpException,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors
+} from '@nestjs/common';
 import {BlogsService} from './blogs.service';
-import {CreateBlogDto} from './dto/create-blog.dto';
-import {UpdateBlogDto} from './dto/update-blog.dto';
-import {PaginationDto} from "./dto/pagination.dto";
-import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
-import {FileInterceptor} from "@nestjs/platform-express";
-import {Blog} from "./model/blog.model";
+import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {SlugDto} from "./dto/slug.dto";
+import {ApiPaginatedResponse} from "../utils/pagination/api-paginated-response.decorator";
+import {Blog} from "@/src/blogs/dto/blog.model";
+import {PaginationDto} from "@/src/utils/pagination/pagination.dto";
+import {FileInterceptor} from "@nestjs/platform-express";
+import {CreateBlogDto} from "@/src/blogs/dto/create-blog.dto";
+import {UpdateBlogDto} from "@/src/blogs/dto/update-blog.dto";
 
 @ApiTags('Blogs')
 @Controller('blogs')
@@ -14,14 +27,14 @@ export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {
   }
 
-  // @Post()
-  // @UseInterceptors(FileInterceptor('image'))
-  // create(@Body() createBlogDto: CreateBlogDto, @UploadedFile() image) {
-  //   return this.blogsService.create(createBlogDto, image);
-  // }
-
+//public
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: typeof HttpException,
+    description:'Page and limit must be greater than 0'
+  })
   @ApiOperation({summary: 'Get blogs '})
-  @ApiResponse({status: 200, type: [Blog]})
+  @ApiPaginatedResponse(Blog)
   @Get()
   async findAll(@Query() paginationDto: PaginationDto) {
     return this.blogsService.findAll(paginationDto);
@@ -34,18 +47,25 @@ export class BlogsController {
     return this.blogsService.findOne(params.slug);
   }
 
-  // @Patch(':slug')
-  // update(@Param('slug') slug: string, @Body() updateBlogDto: UpdateBlogDto) {
-  //   return this.blogsService.update(slug, updateBlogDto);
-  // }
-  //
-  // @Delete(':slug')
-  // remove(@Param('slug') slug: string) {
-  //   return this.blogsService.remove(slug);
-  // }
-  //
-  // @Delete()
-  // removeAll() {
-  //   return this.blogsService.removeAll();
-  // }
+//admin
+  @ApiBearerAuth("ADMIN")
+  @Post()
+  @UseInterceptors(FileInterceptor('image'))
+  create(@Body() createBlogDto: CreateBlogDto, @UploadedFile() image) {
+    return this.blogsService.create(createBlogDto, image);
+  }
+
+  @ApiBearerAuth("ADMIN")
+  @Patch(':slug')
+  update(@Param('slug') slug: string, @Body() updateBlogDto: UpdateBlogDto) {
+    return this.blogsService.update(slug, updateBlogDto);
+  }
+
+  @ApiBearerAuth("ADMIN")
+  @Delete(':slug')
+  remove(@Param('slug') slug: string) {
+    return this.blogsService.remove(slug);
+  }
+
 }
+

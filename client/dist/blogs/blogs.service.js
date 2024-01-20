@@ -15,12 +15,42 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BlogsService = void 0;
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
-const blog_model_1 = require("./model/blog.model");
 const files_service_1 = require("../files/files.service");
+const pagination_1 = require("../utils/pagination/pagination");
+const blog_model_1 = require("./dto/blog.model");
 let BlogsService = class BlogsService {
     constructor(blogRepository, fileService) {
         this.blogRepository = blogRepository;
         this.fileService = fileService;
+    }
+    async findAll(paginationDto) {
+        const { page = 1, limit = 10 } = paginationDto;
+        paginationDto = { page, limit };
+        const fields = ['page', 'limit'];
+        fields.forEach((field) => {
+            const fieldName = `${field.slice(0, 1).toUpperCase()}${field.slice(1)}`;
+            if (Number(paginationDto[field]) < 1) {
+                throw new common_1.HttpException(`${fieldName} must be greater than 0`, common_1.HttpStatus.BAD_REQUEST);
+            }
+        });
+        const data = await this.blogRepository.findAndCountAll({
+            offset: (0, pagination_1.getOffsetFromPageAndLimit)({ page, limit }),
+            limit,
+            attributes: { exclude: ['createdAt', 'updatedAt'] }
+        });
+        return {
+            total: data.count, limit, page, results: data.rows,
+        };
+    }
+    async findOne(slug) {
+        let blog;
+        try {
+            blog = await this.blogRepository.findOne({ where: { slug }, attributes: { exclude: ['createdAt', 'updatedAt'] } });
+        }
+        catch (e) {
+            throw new common_1.HttpException(`Blog with slug : ${slug}, not found`, common_1.HttpStatus.NOT_FOUND);
+        }
+        return blog;
     }
     async create(createBlogDto, image) {
         const directoryPath = 'blogs';
@@ -56,38 +86,12 @@ let BlogsService = class BlogsService {
         }
         return blog;
     }
-    async findAll(paginationDto) {
-        const { page = 1, limit = 10 } = paginationDto;
-        paginationDto = { page, limit };
-        const fields = ['page', 'limit'];
-        fields.forEach((field) => {
-            const fieldName = `${field.slice(0, 1).toUpperCase()}${field.slice(1)}`;
-            if (isNaN(paginationDto[field])) {
-                throw new common_1.HttpException(`${fieldName} must be a number`, common_1.HttpStatus.BAD_REQUEST);
-            }
-            if (Number(paginationDto[field]) < 1) {
-                throw new common_1.HttpException(`${fieldName} must be greater than 0`, common_1.HttpStatus.BAD_REQUEST);
-            }
-        });
-        const offset = (page - 1) * limit;
-        return await this.blogRepository.findAll({ offset, limit, attributes: { exclude: ['createdAt', 'updatedAt'] } });
-    }
-    async findOne(slug) {
-        let blog;
-        try {
-            blog = await this.blogRepository.findOne({ where: { slug }, attributes: { exclude: ['createdAt', 'updatedAt'] } });
-        }
-        catch (e) {
-            throw new common_1.HttpException(`Blog with slug : ${slug}, not found`, common_1.HttpStatus.NOT_FOUND);
-        }
-        return blog;
-    }
     async update(slug, updateBlogDto) {
+        const blogToUpdate = await this.blogRepository.findOne({ where: { slug } });
+        if (!blogToUpdate) {
+            throw new common_1.HttpException(`Blog with slug: ${slug} not found`, common_1.HttpStatus.NOT_FOUND);
+        }
         try {
-            const blogToUpdate = await this.blogRepository.findOne({ where: { slug } });
-            if (!blogToUpdate) {
-                throw new common_1.HttpException(`Blog with slug: ${slug} not found`, common_1.HttpStatus.NOT_FOUND);
-            }
             Object.assign(blogToUpdate, updateBlogDto);
             await blogToUpdate.save();
             return blogToUpdate;
@@ -97,26 +101,16 @@ let BlogsService = class BlogsService {
         }
     }
     async remove(slug) {
+        const blogToRemove = await this.blogRepository.findOne({ where: { slug } });
+        if (!blogToRemove) {
+            throw new common_1.HttpException(`Blog with slug: ${slug} not found`, common_1.HttpStatus.NOT_FOUND);
+        }
         try {
-            const blogToRemove = await this.blogRepository.findOne({ where: { slug } });
-            if (!blogToRemove) {
-                throw new common_1.HttpException(`Blog with slug: ${slug} not found`, common_1.HttpStatus.NOT_FOUND);
-            }
             await blogToRemove.destroy();
             return `Blog with slug: ${slug} removed successfully`;
         }
         catch (e) {
             throw new common_1.HttpException(`Error removing blog with slug: ${slug}`, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    async removeAll() {
-        try {
-            await this.blogRepository.truncate();
-            return `Blogs removed successfully`;
-        }
-        catch (e) {
-            console.log("e", e);
-            throw new common_1.HttpException(`Error removing blogs`, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

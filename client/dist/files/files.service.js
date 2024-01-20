@@ -14,7 +14,6 @@ const uuid = require("uuid");
 let FilesService = class FilesService {
     async createImage({ image, directoryPath, fileName }) {
         try {
-            console.log("image", image);
             const arrDot = image.originalname?.split('.');
             const imageName = `${fileName || uuid.v4()}.${arrDot?.[arrDot.length - 1] || 'jpg'}`;
             const filePath = path.resolve(__dirname, '..', '..', 'static', directoryPath);
@@ -30,7 +29,7 @@ let FilesService = class FilesService {
     }
     async removeFile({ directoryPath, fileName }) {
         try {
-            const filePath = path.resolve(__dirname, '..', 'static', directoryPath);
+            const filePath = path.resolve(__dirname, '..', '..', 'static', directoryPath);
             await fs.promises.rm(path.join(filePath, fileName));
         }
         catch (e) {

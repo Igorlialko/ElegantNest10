@@ -21,7 +21,9 @@ let AuthService = class AuthService {
     }
     async login(userDto) {
         const user = await this.validateUser(userDto);
-        return this.generateToken(user);
+        const { token } = this.generateToken(user);
+        user.password = undefined;
+        return { user, token };
     }
     async registration(userDto) {
         const candidate = await this.userService.getUserByEmail(userDto.email);
@@ -30,9 +32,11 @@ let AuthService = class AuthService {
         }
         const hashPassword = await bcrypt.hash(userDto.password, 5);
         const user = await this.userService.createUser({ ...userDto, password: hashPassword });
-        return this.generateToken(user);
+        const { token } = this.generateToken(user);
+        user.password = undefined;
+        return { user, token };
     }
-    async generateToken(user) {
+    generateToken(user) {
         const payload = { email: user.email, id: user.id, roles: user.roles };
         return {
             token: this.jwtService.sign(payload)
@@ -45,6 +49,12 @@ let AuthService = class AuthService {
             return user;
         }
         throw new common_1.UnauthorizedException({ message: 'Некорректный емайл или пароль' });
+    }
+    async getProfile(token) {
+        const { email } = this.jwtService.verify(token);
+        const user = await this.userService.getUserByEmail(email);
+        user.password = undefined;
+        return { user, token };
     }
 };
 exports.AuthService = AuthService;

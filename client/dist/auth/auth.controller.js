@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const create_user_dto_1 = require("../users/dto/create-user.dto");
 const auth_service_1 = require("./auth.service");
+const users_model_1 = require("../users/users.model");
+const jwt_auth_guard_1 = require("./jwt-auth.guard");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -27,9 +29,15 @@ let AuthController = class AuthController {
     registration(userDto) {
         return this.authService.registration(userDto);
     }
+    getProfile(req) {
+        const authHeader = req.headers.authorization;
+        const token = authHeader.split(' ')[1];
+        return this.authService.getProfile(token);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Sign in' }),
     (0, common_1.Post)('/login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -37,12 +45,48 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 __decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Sign up' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        schema: {
+            properties: {
+                token: {
+                    type: 'string',
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhhbmFuZHJlaTAxQGdtYWlsLmNvbSIsInN1YiI6IjYyOTA5NmUzMTk0MmFmN2Q2YmFkYTkyNCIsImlzX2FjdGl2ZSI6InRydWUiLCJpYXQiOjE2NTQyNzYzMDgsImV4cCI6MTY1Njg2ODMwOH0.MUXgJhHvmPqbLNbnN9Wj-ipIrDOViLHpOQTCcUCah1A',
+                },
+                user: { $ref: (0, swagger_1.getSchemaPath)(users_model_1.User) }
+            },
+        },
+    }),
     (0, common_1.Post)('/registration'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "registration", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'get me users' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        schema: {
+            properties: {
+                token: {
+                    type: 'string',
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhhbmFuZHJlaTAxQGdtYWlsLmNvbSIsInN1YiI6IjYyOTA5NmUzMTk0MmFmN2Q2YmFkYTkyNCIsImlzX2FjdGl2ZSI6InRydWUiLCJpYXQiOjE2NTQyNzYzMDgsImV4cCI6MTY1Njg2ODMwOH0.MUXgJhHvmPqbLNbnN9Wj-ipIrDOViLHpOQTCcUCah1A',
+                },
+                user: { $ref: (0, swagger_1.getSchemaPath)(users_model_1.User) }
+            },
+        },
+    }),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiForbiddenResponse)({ status: 403, }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('/me'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "getProfile", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('Auth'),
     (0, common_1.Controller)('auth'),

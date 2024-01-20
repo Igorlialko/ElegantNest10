@@ -2,15 +2,49 @@ import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {CreateBlogDto} from './dto/create-blog.dto';
 import {UpdateBlogDto} from './dto/update-blog.dto';
 import {InjectModel} from "@nestjs/sequelize";
-import {Blog} from "./model/blog.model";
-import {PaginationDto} from "./dto/pagination.dto";
 import {FilesService} from "../files/files.service";
+import {PaginatedDto, PaginationDto} from "../utils/pagination/pagination.dto";
+import {getOffsetFromPageAndLimit} from "../utils/pagination/pagination";
+import {Blog} from "@/src/blogs/dto/blog.model";
 
 @Injectable()
 export class BlogsService {
 
   constructor(@InjectModel(Blog) private blogRepository: typeof Blog, private fileService: FilesService) {
   }
+
+  async findAll(paginationDto: PaginationDto): Promise<PaginatedDto<Blog>> {
+
+    const {page = 1, limit = 10} = paginationDto;
+    paginationDto = {page, limit}; // for add default params
+    const fields = ['page', 'limit'];
+    fields.forEach((field) => { //validation query params
+      const fieldName = `${field.slice(0, 1).toUpperCase()}${field.slice(1)}`
+      if (Number(paginationDto[field]) < 1) {
+        throw new HttpException(`${fieldName} must be greater than 0`, HttpStatus.BAD_REQUEST);
+      }
+    })
+
+    const data = await this.blogRepository.findAndCountAll({
+      offset: getOffsetFromPageAndLimit({page, limit}),
+      limit,
+      attributes: {exclude: ['createdAt', 'updatedAt']}
+    })
+    return {
+      total: data.count, limit, page, results: data.rows,
+    }
+  }
+
+  async findOne(slug: string) {
+    let blog
+    try {
+      blog = await this.blogRepository.findOne({where: {slug}, attributes: {exclude: ['createdAt', 'updatedAt']}})
+    } catch (e) {
+      throw new HttpException(`Blog with slug : ${slug}, not found`, HttpStatus.NOT_FOUND);
+    }
+    return blog
+  }
+
 
   async create(createBlogDto: CreateBlogDto, image: any) {
     const directoryPath = 'blogs'
@@ -50,44 +84,14 @@ export class BlogsService {
     return blog
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<Blog[]> {
-
-    const {page = 1, limit = 10} = paginationDto;
-    paginationDto = {page, limit}; // for add default params
-    const fields = ['page', 'limit'];
-    fields.forEach((field) => { //validation query params
-      const fieldName = `${field.slice(0, 1).toUpperCase()}${field.slice(1)}`
-      if (isNaN(paginationDto[field])) {
-        throw new HttpException(`${fieldName} must be a number`, HttpStatus.BAD_REQUEST);
-      }
-      if (Number(paginationDto[field]) < 1) {
-        throw new HttpException(`${fieldName} must be greater than 0`, HttpStatus.BAD_REQUEST);
-      }
-    })
-    const offset = (page - 1) * limit;
-    return await this.blogRepository.findAll({offset, limit, attributes: {exclude: ['createdAt', 'updatedAt']}})
-  }
-
-  async findOne(slug: string) {
-    let blog
-    try {
-      blog = await this.blogRepository.findOne({where: {slug}, attributes: {exclude: ['createdAt', 'updatedAt']}})
-    } catch (e) {
-      throw new HttpException(`Blog with slug : ${slug}, not found`, HttpStatus.NOT_FOUND);
-    }
-    return blog
-  }
 
   async update(slug: string, updateBlogDto: UpdateBlogDto) {
+    const blogToUpdate = await this.blogRepository.findOne({where: {slug}});
+    if (!blogToUpdate) {
+      throw new HttpException(`Blog with slug: ${slug} not found`, HttpStatus.NOT_FOUND);
+    }
     try {
-      const blogToUpdate = await this.blogRepository.findOne({where: {slug}});
-//todo: refactor , throw not working correct in try block
-      if (!blogToUpdate) {
-        throw new HttpException(`Blog with slug: ${slug} not found`, HttpStatus.NOT_FOUND);
-      }
-
       Object.assign(blogToUpdate, updateBlogDto);
-
       // Save the updated blog entry
       await blogToUpdate.save()
 
@@ -98,29 +102,16 @@ export class BlogsService {
   }
 
   async remove(slug: string) {
+    const blogToRemove = await this.blogRepository.findOne({where: {slug}});
+    if (!blogToRemove) {
+      throw new HttpException(`Blog with slug: ${slug} not found`, HttpStatus.NOT_FOUND);
+    }
+
     try {
-      const blogToRemove = await this.blogRepository.findOne({where: {slug}});
-//todo: refactor , throw not working correct in try block
-      if (!blogToRemove) {
-        throw new HttpException(`Blog with slug: ${slug} not found`, HttpStatus.NOT_FOUND);
-      }
-
       await blogToRemove.destroy()
-
       return `Blog with slug: ${slug} removed successfully`;
     } catch (e) {
       throw new HttpException(`Error removing blog with slug: ${slug}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  async removeAll() {
-    try {
-      await this.blogRepository.truncate();
-
-      return `Blogs removed successfully`;
-    } catch (e) {
-      console.log("e", e)
-      throw new HttpException(`Error removing blogs`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

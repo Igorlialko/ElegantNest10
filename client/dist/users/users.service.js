@@ -69,7 +69,7 @@ let UsersService = class UsersService {
         if (!user) {
             throw new common_1.HttpException("Пользователь не найден", common_1.HttpStatus.NOT_FOUND);
         }
-        user.banned = true;
+        user.isBanned = true;
         user.banReason = dto.banReason;
         await user.save();
         return user;

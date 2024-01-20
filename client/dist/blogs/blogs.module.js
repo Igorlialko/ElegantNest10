@@ -11,8 +11,8 @@ const common_1 = require("@nestjs/common");
 const blogs_service_1 = require("./blogs.service");
 const blogs_controller_1 = require("./blogs.controller");
 const sequelize_1 = require("@nestjs/sequelize");
-const blog_model_1 = require("./model/blog.model");
 const files_module_1 = require("../files/files.module");
+const blog_model_1 = require("./dto/blog.model");
 let BlogsModule = class BlogsModule {
 };
 exports.BlogsModule = BlogsModule;

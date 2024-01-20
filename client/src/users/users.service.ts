@@ -13,7 +13,7 @@ export class UsersService {
               private roleService: RolesService) {
   }
 
-  async createUser(dto: CreateUserDto) {
+  async createUser(dto: CreateUserDto):Promise<User> {
 
     let role;
     try {
@@ -65,7 +65,7 @@ export class UsersService {
     if (!user) {
       throw new HttpException("Пользователь не найден", HttpStatus.NOT_FOUND);
     }
-    user.banned = true;
+    user.isBanned = true;
     user.banReason = dto.banReason;
     await user.save();
     return user;
